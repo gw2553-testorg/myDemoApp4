@@ -75,15 +75,15 @@ instances:
     <<: *t_ltm
     dataCenter: GL
     pool:
-      - winAppSrvGL1
-      - winAppSrvGL2
+      - winAppSrvGL4
+      - winAppSrvGL5
     
   ltmWebRO1: 
     <<: *t_ltm
     dataCenter: RO
     pool:
-      - winAppSrvRO1
-      - winAppSrvRO2
+      - winAppSrvRO4
+      - winAppSrvRO5
   
   gtmWeb1:
     <<: *t_gtm
