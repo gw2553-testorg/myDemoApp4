@@ -59,6 +59,9 @@ instances:
      
   winAppSrvGL2: 
     <<: *appGL
+    appDrives:
+      d: 500
+      e: 1000
     
   winAppSrvRO1: &appRO
     <<: *t_webAppServer
