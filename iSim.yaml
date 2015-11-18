@@ -47,25 +47,25 @@ template:
     eSHS: is_server_windows_vm
     size: '2/16'                # [ 2/2 2/4 2/6 2/8 2/16 4/8 4/16 4/24]
     function: APP            # [ APP | DBS | WEB | etc... ] - (Defatult APP)
-    bim:  2012R2WebApp                # [ 2008SP2Base|2008SP2WebApp|2008R2Base|2008R2WebApp|2012R2Base|2012R2WebApp ] 
+    bim:  2008R2WebApp                # [ 2008SP2Base|2008SP2WebApp|2008R2Base|2008R2WebApp|2012R2Base|2012R2WebApp ] 
     localAdmins:  myAdminsGroup      # Local adimins group
     networkArea:  MPN       # [ MPN (default) | DMZ-INET | DMZ-EXNET | DMZ-PCI | Other (Description) ]
 
 instances:
-  winAppSrvGL1: &appGL
+  winAppSrvGL4: &appGL
     <<: *t_webAppServer
     dataCenter : GL
     maintWindow: *t_mwA
      
-  winAppSrvGL2: 
+  winAppSrvGL5: 
     <<: *appGL
     
-  winAppSrvRO1: &appRO
+  winAppSrvRO4: &appRO
     <<: *t_webAppServer
     dataCenter : RO
     maintWindow: *t_mwB
     
-  winAppSrvRO2: 
+  winAppSrvRO5: 
     <<: *appRO
     appDrives:
       d: 100
