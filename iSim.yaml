@@ -1,0 +1,91 @@
+
+template:
+  
+  # GTM
+  gtml: &t_gtm
+    eSHS: is_network_f5_gtm
+    networkArea: MPN
+    distribution: hot-standby                # [ hot-standby | round-robin | geographic ]
+    failOver: auto
+    failBack: auto
+  
+  ltm1: &t_ltm
+    eSHS: is_network_f5_ltm
+    distribution: round-robin                 # [ round-robin | other????? ]
+    networkArea: MPN                          # [ MPN | DMZ ]
+    persistance:  cookie                      # [ cookie | sourceip | none ]
+    inputPort:  80                            # [ input port number ]   
+    servicePort:  80                          # [ Port the server is listening on ]
+    service:  http                            # [ e.g. http, https, tcp ]
+  
+  commonAppParams: &t_common_app
+    appFunctionType:  interactive   # [ interactive | batch ]
+    appName:  REPLACE               # [ Name of Application ]
+    businessUnit: REPLACE           # [ e.g. ISG-BIA]
+    eccP1Restore: n                 # [yes|no]
+    envType: prod                   # [prod|tpt|test|etest|dev]
+    operationalHours: '24x7'        # [24x7|9-5|hardware|rogue]
+    managementLevel:  '24x7'        # [24x7|9-5|hardware|rogue]
+    recoveryTier: 3                 # [0-9] 
+    priContact: REPLACE             # [email contact group] 
+    secContact: REPLACE             # [email contact group]
+    
+  maintWindowA: 
+    maintWindow: &t_mwA
+      day: sat            #[mon,tue,wed,thu,fri,sat,sun]
+      window: '0600'          #[0200|0600|1000|1400|1800|2200] 
+      SMStype: prod        # [ prod, staging, earlyAdopter, preprod, test ]
+    
+  maintWindowB: 
+    maintWindow: &t_mwB
+      day: sun            #[mon,tue,wed,thu,fri,sat,sun]
+      window: '0600'          #[0200|0600|1000|1400|1800|2200] 
+      SMStype: prod        # [ prod, staging, earlyAdopter, preprod, test ]
+    
+  webAppServer: &t_webAppServer
+    <<: *t_common_app
+    eSHS: is_server_windows_vm
+    size: '2/8'                # [ 2/2 2/4 2/6 2/8 2/16 4/8 4/16 4/24]
+    function: APP            # [ APP | DBS | WEB | etc... ] - (Defatult APP)
+    bim:  2012R2WebApp                # [ 2008SP2Base|2008SP2WebApp|2008R2Base|2008R2WebApp|2012R2Base|2012R2WebApp ] 
+    localAdmins:  myAdminsGroup      # Local adimins group
+    networkArea:  MPN       # [ MPN (default) | DMZ-INET | DMZ-EXNET | DMZ-PCI | Other (Description) ]
+
+instances:
+  winAppSrvGL1: &appGL
+    <<: *t_webAppServer
+    dataCenter : GL
+    maintWindow: *t_mwA
+     
+  winAppSrvGL2: 
+    <<: *appGL
+    
+  winAppSrvRO1: &appRO
+    <<: *t_webAppServer
+    dataCenter : RO
+    maintWindow: *t_mwB
+    
+  winAppSrvRO2: 
+    <<: *appRO
+  
+  ltmWebGL1: 
+    <<: *t_ltm
+    dataCenter: GL
+    pool:
+      - winAppSrvGL1
+      - winAppSrvGL2
+    
+  ltmWebRO1: 
+    <<: *t_ltm
+    dataCenter: RO
+    pool:
+      - winAppSrvRO1
+      - winAppSrvRO2
+  
+  gtmWeb1:
+    <<: *t_gtm
+    domainName: REPLACE.igslb.allstate.com
+    pool:
+      - ltmWebGL1
+      - ltmWebRO1
+      
